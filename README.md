@@ -12,6 +12,21 @@
 - 🎯 **智能错误处理**: 完善的异常处理和用户提示
 
 ## 📋 使用前准备
+### 0. 项目结构
+```
+python-ai-code/
+├── src/
+│   └── ai-api/
+│       ├── ai_chat_with_api.py         # 主程序文件，AI对话核心逻辑
+│       ├── rag_manager.py              # RAG（检索增强生成）功能模块
+│       ├── run_ai_chat.py              # 启动脚本
+│       ├── config.json                 # 配置文件
+│       ├── test_rag_functionality.py   # RAG功能测试脚本
+│       └── test_rag_document.txt       # RAG测试文档
+├── README.md                          # 项目说明文档
+├── requirements.txt                   # Python依赖包列表
+└── pyproject.toml                     # 项目配置文件（空）
+```
 
 ### 1. 配置API密钥
 
