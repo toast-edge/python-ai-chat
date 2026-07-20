@@ -1,0 +1,23 @@
+{
+  "ai_service": "qwen",
+  "openai": {
+    "api_key": "sk-your-openai-api-key-here",
+    "model": "gpt-3.5-turbo"
+  },
+  "claude": {
+    "api_key": "sk-ant-your-claude-api-key-here",
+    "model": "claude-3-sonnet-20240229"
+  },
+  "qwen": {
+    "api_key": "sk-4d5aa11695a740fd9b69ac8ee05ab0cb",
+    "model": "qwen-max"
+  },
+  "local": {
+    "base_url": "http://localhost:11434",
+    "model": "llama2"
+  },
+  "system_prompt": "你是一个友善、有帮助的AI助手。请用中文回答问题，并尽量提供有用、准确的信息。",
+  "rag": {
+    "enabled": true
+  }
+}
