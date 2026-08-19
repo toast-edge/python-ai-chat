@@ -9,8 +9,9 @@
     "model": "claude-3-sonnet-20240229"
   },
   "qwen": {
-    "api_key": "sk-4d5aa11695a740fd9b69ac8ee05ab0cb",
-    "model": "qwen-max"
+    "api_key": "sk-ws-H.ERDMIIR.QVkQ.MEUCIQCVxv9QV-3XvZtAJAZsfGbz_tK4QMp-W4u8O6KoC0_BXAIgMQx8f-68mkz_2dVp7RTG00fC69H_rtTsDZNvY8RkPSk",
+    "model": "qwen3.7-max-2026-05-20",
+    "base_url": "https://llm-y67yca7aadrfdfrg.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
   },
   "local": {
     "base_url": "http://localhost:11434",

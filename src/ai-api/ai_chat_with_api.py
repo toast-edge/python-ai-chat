@@ -341,6 +341,10 @@ class QwenClient(AIClient):
             
             full_response = ""
             for chunk in stream:
+                # 跳过空 choices 的 chunk（如末尾携带 usage 统计的 chunk），
+                # 否则 chunk.choices[0] 会抛 IndexError: list index out of range
+                if not chunk.choices:
+                    continue
                 if chunk.choices[0].delta.content is not None:
                     content = chunk.choices[0].delta.content
                     full_response += content
