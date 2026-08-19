@@ -15,7 +15,9 @@ import argparse
 # 导入RAG管理器
 from rag_manager import RAGManager
 
-
+"""客户端层（AIClient 及其子类）:
+    负责与外部 AI API 通信。屏蔽了 OpenAI、Claude、Qwen 各自不同的接口差异，对外提供统一的 get_response（传统）和 get_streaming_response（流式）方法。
+"""
 class AIClient:
     """AI客户端基类"""
     
@@ -357,22 +359,25 @@ class QwenClient(AIClient):
         except Exception as e:
             yield f"❌ Qwen API请求失败: {e}"
 
-
+"""业务逻辑层（AIChatter）:
+    核心控制器。负责管理对话历史、加载配置、协调 RAG（检索增强生成）和提示词模板，并决定何时调用客户端。
+"""
 class AIChatter:
     """AI对话器"""
     
     def __init__(self, config_file: str = "config.json", preset_service: str = None, streaming: bool = True):
         """初始化"""
-        self.config_file = config_file
-        self.conversation_history: List[Dict] = []
         self.user_name = "用户"
         self.ai_name = "AI助手"
-        self.ai_client: Optional[AIClient] = None
-        self.preset_service = preset_service
-        self.streaming = streaming  # 是否使用流式响应
-        self.prompt_manager = None
-        self.rag_manager: Optional[RAGManager] = None
-        self.rag_enabled = False  # 默认禁用RAG功能
+        self.config_file = config_file                  # 保存配置文件路径
+        self.preset_service = preset_service            # 保存预设服务 (qwen)
+        self.streaming = streaming                      # 是否使用流式响应
+
+        self.ai_client: Optional[AIClient] = None       # AI客户端（当前为None，等待初始化）
+        self.conversation_history: List[Dict] = []      # 存放多轮对话历史
+        self.prompt_manager = None                      # 提示词管理器（当前为None，等待初始化）
+        self.rag_manager: Optional[RAGManager] = None   # RAG管理器（当前为None，等待初始化）
+        self.rag_enabled = False                        # 默认禁用RAG功能
         
         # 加载配置
         self.load_config()
@@ -580,9 +585,6 @@ class AIChatter:
         """获取传统一次性响应"""
         try:
             response = self.ai_client.get_response(messages)
-            # 添加到对话历史
-            self.conversation_history.append({"role": "user", "content": messages[-1]["content"]})
-            self.conversation_history.append({"role": "assistant", "content": response})
             return response
         except Exception as e:
             return f"❌ 传统响应获取失败: {e}"
@@ -602,10 +604,6 @@ class AIChatter:
                 full_response += content_chunk
             
             print()  # 换行
-            
-            # 添加到对话历史
-            self.conversation_history.append({"role": "user", "content": messages[-1]["content"]})
-            self.conversation_history.append({"role": "assistant", "content": full_response})
             
             return full_response
             
@@ -665,29 +663,6 @@ class AIChatter:
             print(f"API密钥状态: {'已设置' if api_key and api_key != 'sk-ant-your-claude-api-key-here' else '未设置'}")
         
         print("=" * 50)
-    
-    def setup_prompt_manager(self):
-        """初始化提示词管理器"""
-        try:
-            # 导入提示词管理器（需要创建独立模块）
-            import sys
-            import os
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            sys.path.insert(0, current_dir)
-            
-            try:
-                from prompt_manager import PromptManager
-                self.prompt_manager = PromptManager()
-                return True
-            except ImportError:
-                # 如果提示词管理器模块不存在，创建简化版本
-                print("⚠️ 提示词管理器模块不存在，创建简化版本")
-                self.prompt_manager = None
-                return False
-        except Exception as e:
-            print(f"❌ 提示词管理器初始化失败: {e}")
-            self.prompt_manager = None
-            return False
     
     def show_prompt_templates(self):
         """显示可用的提示词模板"""
@@ -1114,15 +1089,15 @@ class AIChatter:
                     print(f"{self.ai_name}: 请输入一些内容与我对话！")
                     continue
                 
-                # 添加用户消息
-                self.add_message("user", user_input)
-                
-                # 获取AI响应
+                # 获取AI响应（内部根据历史构建 prompt，流式模式会实时打印内容）
                 print(f"\n{self.ai_name}: 正在思考...", end="", flush=True)
                 ai_response = self.get_ai_response(user_input)
-                print(f"\r{self.ai_name}: {ai_response}")
-                
-                # 添加AI响应
+                if not self.streaming:
+                    # 传统模式：一次性显示完整回复
+                    print(f"\r{self.ai_name}: {ai_response}")
+
+                # 添加本轮用户消息与AI响应到历史
+                self.add_message("user", user_input)
                 self.add_message("assistant", ai_response)
                 
             except KeyboardInterrupt:
@@ -1135,10 +1110,13 @@ class AIChatter:
 
 def main():
     """主函数"""
+    # 命令行参数解析器，使用 Python 内置的 argparse 库 
     parser = argparse.ArgumentParser(description='AI对话程序')
     parser.add_argument('--config', default='config.json', help='配置文件路径')
     parser.add_argument('--service', choices=['openai', 'claude', 'qwen', 'local'], help='启动时预设的AI服务')
-    parser.add_argument('--streaming', default=True, help='是否使用流式响应 (默认: True)')
+
+    # 严格处理字符串（兼容你当前的传参方式）
+    parser.add_argument('--streaming',  type=lambda x: x.lower() == 'true', default=True, help='是否使用流式响应 (默认: True)')
     args = parser.parse_args()
     
     print("🚀 启动AI对话程序...")

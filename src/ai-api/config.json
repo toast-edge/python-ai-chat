@@ -10,7 +10,7 @@
   },
   "qwen": {
     "api_key": "sk-ws-H.ERDMIIR.QVkQ.MEUCIQCVxv9QV-3XvZtAJAZsfGbz_tK4QMp-W4u8O6KoC0_BXAIgMQx8f-68mkz_2dVp7RTG00fC69H_rtTsDZNvY8RkPSk",
-    "model": "qwen3.7-max-2026-05-20",
+    "model": "qwen3.8-27b",
     "base_url": "https://llm-y67yca7aadrfdfrg.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
   },
   "local": {

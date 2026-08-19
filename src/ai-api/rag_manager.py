@@ -187,14 +187,19 @@ class RAGManager:
         Args:
             config: RAG配置参数
         """
-        config = config or {}
+        config = config or {}   # ① 如果没传配置，给个空字典
         
-        chunk_size = config.get("chunk_size", 512)
-        chunk_overlap = config.get("chunk_overlap", 100)
-        embedding_model = config.get("embedding_model", "all-MiniLM-L6-v2")
+        chunk_size = config.get("chunk_size", 512)                              # ② 读取分块大小
+        chunk_overlap = config.get("chunk_overlap", 100)                        # ③ 读取分块重叠大小
+        embedding_model = config.get("embedding_model", "all-MiniLM-L6-v2")     # ④ 读取嵌入模型名
         
+        # ⑤ 创建文档处理器（专门负责切分文本）
         self.document_processor = DocumentProcessor(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+
+        # ⑥ 创建向量存储管理器（专门负责把文本变成向量并搜索）
         self.vector_store_manager = VectorStoreManager(embedding_model=embedding_model)
+
+        # ⑦ 标记为未初始化（内存里还是空的）
         self.is_initialized = False
     
     def add_document(self, file_path: str):
