@@ -20,5 +20,19 @@
   "system_prompt": "你是一个友善、有帮助的AI助手。请用中文回答问题，并尽量提供有用、准确的信息。",
   "rag": {
     "enabled": true
+  },
+  "postgres": {
+    "host": "47.93.0.181",
+    "port": 5432,
+    "database": "personal_finance",
+    "user": "readonly_user",
+    "password": "readonly",
+    "connect_timeout": 10
+  },
+  "database_query": {
+    "enabled": true,
+    "tables": ["alipay_bill", "alipay_bill_info", "wechat_pay_bill", "wechat_pay_bill_info"],
+    "max_rows": 100,
+    "query_timeout_seconds": 30
   }
 }
